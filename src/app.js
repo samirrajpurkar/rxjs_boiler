@@ -136,22 +136,114 @@ function getGitHubUser(username) {
     dataType:'jsonp'}).promise();
 }
 
-Rx.Observable.fromEvent('#username', 'keyup')
-  .
-
-Rx.Observable.fromPromise(getGitHubUser('samirrajpurkar'))
+Rx.Observable.fromEvent($('#username'), 'keyup')
   .subscribe(
-    user => {
-      console.log(user)
-      $('#repos').text('Number of Git Repos: ' +user.data.public_repos)
-    },
+    username => {
+      Rx.Observable.fromPromise(getGitHubUser(username.target.value))
+        .subscribe(
+          user => {
+            console.log(user)
+            $('#usernames').append('<li>Git Hub User Names: ' +user.data.name + '</li>')
+          },
+          error => {console.log(error)},
+          complete => {console.log('git hub user details completed')}
+        )
+    }
+)
+
+/* Observables from Interval, Timer and Range */
+const interval$ = Rx.Observable.interval(100).take(10)
+interval$.subscribe(
+  t => {console.log(t)},
+  error => {console.log(error)},
+  complete => {console.log('interval observable completed!')}
+)
+
+const timer$ = Rx.Observable.timer(1000, 100).take(5)
+timer$.subscribe(
+  t => {console.log(t)},
+  error => {console.log(error)},
+  complete => {console.log('timer observable completed!')}
+)
+
+const range$ = Rx.Observable.range(25,30)
+range$.subscribe(
+  r => {console.log(r)},
+  error => {console.log(error)},
+  complete => {console.log('range observable completed!')}
+)
+
+Rx.Observable.interval(100)
+ .take(4)
+ .map(e => {return (e * e)})
+ .subscribe(
+    d => {console.log(d)},
     error => {console.log(error)},
-    complete => {console.log('git hub user details completed')}
+    complete => {console.log('doubling the counter using map completed')}
+)
+
+Rx.Observable.from(['Tim', 'Jim', 'Tom'])
+  .map((name) => {
+    return name.toUpperCase()
+  })
+  .subscribe(
+    name => {console.log(name)},
+    error => {console.log(error)},
+    complete => {console.log('toUpperCase completed')}
   )
 
+Rx.Observable.from([{name: 'Will', age: 20}, {name: 'Rahul', age: 30}, {name: 'Sal', age: 50}])
+  .pluck('age')
+  .subscribe(
+      o => {console.log(o)},
+      error => {console.log(error)},
+      complete => {console.log('pluck completed')}
+    )
 
+/* Observables from Merge and concat */
+Rx.Observable.of('Hello')
+  .merge(Rx.Observable.of('World!'))
+  .subscribe(
+    o => {console.log(o)},
+    error => {console.log(error)},
+    complete => {console.log('merge completed')}
+    )
 
+const m1$ = Rx.Observable.interval(1000)
+  .map(function(m) {
+    return 'Merge1 :'+m
+  })
+  
+const m2$ = Rx.Observable.interval(500)
+  .map(m => 'Merge2 :'+m)
 
+ Rx.Observable.merge(m1$, m2$)
+  .take(10)
+  .subscribe(
+    m => {console.log(m)},
+    error => {console.log(error)},
+    complete => {console.log('merge timer completed')}
+    )
+
+Rx.Observable.range(0,5)
+  .concat(Rx.Observable.range(6,10))
+  .subscribe(
+    c => {console.log(c)},
+    error => {console.log(error)},
+    complete => {console.log('concat completed')}
+    )
+
+/* Observables from MergeMap, SwitchMap and concatMap*/
+Rx.Observable.of('Hello from MergeMap')
+  .mergeMap(observer => {
+    return Rx.Observable.of(observer +'..I am happy to be merged map...')
+  })
+  .subscribe (
+    o => {console.log(o)},
+    error => {console.log(error)},
+    complete => {console.log('mergeMap completed')}
+
+    )
 
 
 
