@@ -245,6 +245,11 @@ Rx.Observable.of('Hello from MergeMap')
 
     )
 
+/** Test Google Finance http call */
+
+
+
+
 
 
 
